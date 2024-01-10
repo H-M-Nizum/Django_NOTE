@@ -1,0 +1,37 @@
+The Django template is a reusable and dynamic HTML pages that based on template language. 
+There are two way for use template _
+Create a templates folder.
+1) Globally => setting.py line 58 -> 'DIRS': ['templates',],
+2) locally or in the app => No need to change in setting
+
+## Display template file
+	views.py => return render(request, 'template_file_name.html')
+
+## context =>
+	A Context is a dictionary with variable names as the key and their values as the value.
+	A template can have variable names in double curly braces, such as {{ myvar1 }} and {{ myvar2 }}
+
+	Example -
+	views.py => return render(request, 'index.html', {'name': 'aaaaa', 'age': 23, 'id':[1,2,3]})
+	index.html =>   <h3>Name : {{name}}</h3>
+    			<h3>Age : {{Age}}</h3>
+## Condition => 
+    {% if age >= 18 and age < 50 %}
+    	<p>MR. {{name}} is a young man</p>
+    {% elif age >= 50 %}
+    	<p>MR. {{name}} is a old man</p>
+    {% else %}
+    	<p>MR. {{name}} is a child</p>
+    {% endif %}
+
+## loop => 
+	{% for i in id %}
+    		<p>{{i}}</p>
+    	{% endfor %}
+
+## template filers => 
+
+website link _
+	1. https://earthly.dev/blog/django-template-filters/
+	2. https://www.geeksforgeeks.org/django-template-filters/
+	3. https://www.w3schools.com/django/ref_tags_filter.php
