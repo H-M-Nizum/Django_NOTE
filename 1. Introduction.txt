@@ -1,0 +1,40 @@
+A software development is a kind of request response model. user send a request and software return response base on this request.
+Mainly four type of request are available _ (CRUD)
+	. GET (READ)
+	. POST (CREATE)
+	. PUT (UPDATE) 
+	. DELETE (DELETE)
+
+
+Django :- Django is a web application framework in python based on MVT(Model, View, Template) pattern. It's provides built-in deatures for everything , so that it's called batteries included framework.
+
+Model :- The data we want to present, usually data from a database.
+Viewa :- A request handler that returns the relevant template and content - based on the request from the user.
+Templates :- It represents how data should be presented to the user. it may consists of HTML, CSS, JS mixed with django template language.
+
+ORM  :- Object Relational Mapping
+
+______________________________################ Django Project Folder Structure ################______________________________
+
+__init__.py :- Considered as python package
+wsgi.py :- (Web Server Gateway Interface) It describes how a web server communicates with eb applicatons (synchronous)
+asgi.py :- (Asynchromous server gateway interface) . provide both asynchronous and synchronous
+settings.py :- project all setting
+urls.py :- contains info of url attached with application
+manage.py :- project-specific command line utility
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
