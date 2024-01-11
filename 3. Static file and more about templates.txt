@@ -1,0 +1,26 @@
+## Static file => images, css, js file
+There are two way for use static file__
+1) Outer project folder's => setting.py => STATIC_URL = 'static/'
+					   STATICFILES_DIRS = [
+    						BASE_DIR/'static',
+					   ]
+				Html => <img src ="{%static 'img_name.jpeg' %}" alt = "img" />
+
+2) App's => No need to change setting
+
+## css link => <link rel = "stylesheet" href="{%  static 'css/index.css' %}" />
+
+## Bootstrap => Normally use like html file
+
+## Link url use url tag =>
+	url => path('about/', views.about, name = 'about'), 
+	link => <a href="{% url 'about' %}">About</a>
+
+	Argument pass in url_
+	url => path('about/<int:id>', views.about, name = 'about'),
+	link => <a class="nav-link" href="{% url 'about' id %}">About</a>
+
+## Templates Inheritance =>
+1) {% extends "base.html" %} -> Inherit parent template. এই ট্যাগ দিয়ে আমরা অন্য একটা টেমপ্লেট ফাইল কে ইনহেরিট করি |
+2) {% block heading %}{% endblock %} -> Overwrite the portion of a template. এই ট্যাগ দিয়ে আমরা টেমপ্লেট এর কোনো portion কে ওভাররাইড করি
+3) {% include 'template_name' %} -> এই ট্যাগ দিয়ে আমরা কোনো টেমপ্লেট কে ফাংশন এর মত করে রিইউজ করতে পারি
