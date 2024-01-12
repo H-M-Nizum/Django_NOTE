@@ -116,6 +116,7 @@ def add_student(request):
         form = forms.StudentForm(request.POST)  ## Access or get forms data
         if form.is_valid():
             form.save()
+	    return redirect('add_student')  ## When data save in database, user see blank new student form.
     else:
         form = forms.StudentForm()  ## if method are not POST, user can see a form in frontend without data.
     return render(request, 'add_student.html', {'form' : form}) ## finally render add_student.html and add context data
@@ -134,3 +135,65 @@ Html file =>
       </form>
 
 
+
+
+--------------------------------- model form ar kono record ar data edit or update kora -----------------------------
+
+
+views.py => 
+    def function_name(request, id):
+        data = models.Mdel_Name.objects.get(pk=id) 
+	##  get( ) ফাংশনে pk ফিল্ডের ভ্যালু হিসেবে id কে পাঠিয়ে নির্দিষ্ট একটি Post Object এর ডেটা post ভেরিয়েবলে পেয়েছি।
+        variable_name = forms.Form_name(instance=post)
+        # print(data.title)
+        if request.method == 'POST':  ## user post request koreche
+            variable_name = forms.PostForm(request.POST, instance=post)  ## user er post request data ekhane capture korlam
+            if variable_name.is_valid():  ## post kora data gula amra valid kina check kortechi
+                variable_name.save()  ## jodi data valid hoy taile database e save korbo
+                return redirect('homepage')  ## sob thik thakle take add author ei url e pathiye dibo
+    
+        return render(request, 'add_post.html', {'form' : variable_name})
+
+## যদি কোনো মডেলে প্রাইমারি কী হিসেবে কোনো ফিল্ডকে স্পেসিফাই করে না দেয়া হয় সেক্ষেত্রে জ্যাংগো নিজে থেকে pk নামে একটা প্রাইমারি কী ফিল্ড তৈরি করে নেয়।
+
+urls.py => path('edit/<int:id>', views.edit_post, name='edit_post'),
+
+
+htmlFile =>>
+
+{% extends 'base.html' %} {% block content %}
+
+<div class="d-flex flex-wrap justify-content-center px-5 pt-5">
+  {% for post in data %}
+  <div class="col-sm-3">
+    <div class="card m-2">
+      <div class="card-body">
+        <h5 class="card-title">{{post.title}}</h5>
+        <p class="card-text">{{post.content}}</p>
+        <p>Author : {{post.author.name}}</p>
+        <p>
+          Category : {% for cat in post.category.all %} 
+          <button class="btn btn-primary btn-sm m-2" disabled >{{cat.name}} </button>
+          {% endfor %}
+        </p>
+        <a href="{% url 'edit_post' post.id %}" class="btn btn-warning">Edit</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+
+
+
+----------------------- Delete a particular field in a database model ---------------------------
+
+urls.py => path('delete/<int:id>', views.delete_post, name='delete_post')
+
+views.py =>
+    def delete_post(request, id):
+    	post = models.model_name.objects.get(pk=id).delete()
+    	return redirect('homepage')
+
+htmlFile => <a href="{% url 'delete_post' post.id %}" class="btn btn-warning">Delete</a>
