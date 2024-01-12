@@ -1,0 +1,186 @@
+Form => Django have two type of form
+## API Form -> Normal html form
+<form method="post">
+  <label for="exampleInputName" class="form-label">Name</label>
+     <input
+        type="text"
+        class="form-control"
+        id="exampleInputName"
+        aria-describedby="nameHelp"
+        name="username"
+      />
+  </form>
+
+1. form ট্যাগের Attribute, method="post" লিখে আমরা বোঝাতে চেয়েছি ইউজার যখন ফর্ম ফিল আপ করে 
+সাবমিট বাটনে ক্লিক করবে তখন সেটি ব্রাউজার থেকে ডেটা ব্যাকেন্ড বা সার্ভারে  পাঠানোর জন্য রিকুয়েস্ট হিসেবে গন্য হবে ।
+2. {% csrf_token %} ব্যবহার করেছি যেন ইউজার কোনো ম্যালিসিয়াস ইনপুট না দিতে পারে । 
+ফর্মে যদি আমরা csrf_token ব্যবহার না করতাম তাহলে Forbidden(403) ইরোর মেসেজ পেতাম।
+3. input ট্যাগের অ্যাাট্রিবিউট name="username" লিখেছি যেন ব্যাকেন্ড থেকে ডেটা গ্রহন করার সময় 
+উক্ত ইনপুট ফিল্ডের ডেটা username নামে পেতে পারি।
+
+## views.py =>
+if request.method == 'POST':
+        #print(request.POST)
+        name = request.POST.get('username') # Get data from input fields.
+        email = request.POST.get('email')
+        return render(request, './first_app/about.html', {'name' : name, 'email': email})
+
+1. রিকুয়েস্ট এর প্রাপ্ত ডেটা থেকে get( ) ফাংশন ব্যবহার করে ফর্ম এর  name='username' ফিল্ড এর ডেটা নিয়ে নিয়েছি এবং তা name নামের ভ্যারিয়েবলে সেট করেছি।
+
+#### Django Built in form =>>>>>
+forms.py=>
+from django import forms
+
+class contactForm(forms.Form):
+    name = forms.CharField(label="Enter your Name:")
+    email = forms.EmailField(label = "User Email")
+views.py=>
+def DjangoForm(request):
+    form = contactForm(request.POST) # contactForm ক্লাসটিকে কল করা হয়েছে এবং প্যরামিটার হিসেবে request.POST পাঠানো হয়েছে, প্যারামিটার request.POST পাঠানোর উদ্যেশ্য হলো - form নামক ভ্যরিয়েবলে যেন আমরা ব্রাউজার থেকে ফর্মে ইনপুট দেয়া ডেটাসমুহ পাই। 
+    if form.is_valid(): # ফর্মটির ভ্যালিডিটি চেক
+        print(form.cleaned_data) # Access or get form data
+    return render(request, './first_app/django_form.html', {'form':form})
+contact.html=>
+<form method="post">
+    {% csrf_token %}
+    {{form.as_p}} # view ফাইল থেকে form নামে যে ফর্মটী পাঠানো হয়েছিল তা আমরা এখানে {{ }} এর মধ্যে form নামে এক্সেস করতে পেরেছি । form.as_p লেখায় ফর্মটির ইলিমেন্টসমুহ প্যারাগ্রাফ আকারে সাজানো পেয়েছি ।
+    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+</form>
+
+
+####### Crispy form =>>>>>>
+Install crispy => cmd => pip install crispy-bootstrap5
+setting.py =>
+	"crispy_forms",
+	"crispy_bootstrap5",
+
+    CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+    CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+index.html => 
+	{% load crispy_forms_tags %}
+	<form method="post">
+    		{% csrf_token %}
+    		{{form|crispy}}
+    		<button type="submit" class="btn btn-primary mt-2">Submit</button>
+	</form>
+
+##### some formfield =>>>>
+from django import forms
+
+class contactForm(forms.Form):
+    name = forms.CharField(label="Enter your Name:")
+    email = forms.EmailField(label = "User Email")
+    age = forms.IntegerField()
+    weight = forms.FloatField()
+    balance = forms.DecimalField()
+    age = forms.CharField()
+    check = forms.BooleanField()
+    birthday = forms.CharField()
+    appointment = forms.CharField()
+    CHOICES = [('S', 'Small'), ('M', 'Medium'), ('L', 'Large')]
+    size = forms.ChoiceField(choices=CHOICES)
+    MEAL = [('P', 'Pepperoni'), ('M', 'Mashroom'), ('B', 'Beef')]
+    pizza = forms.MultipleChoiceField(choices=MEAL)
+    file=forms.FileField()
+
+
+ইনপুট নেওয়া ফাইলটি ম্যানেজ or save করার জন্য ফর্মটির view ফাংশন এ__views.py =>
+def DjangoForm(request):
+    if request.method == 'POST':
+        form = contactForm(request.POST, request.FILES) ## request.FILES, POST রিকুয়েস্ট-এ থাকা ডেটার পাশাপাশি  ফাইলও access kore ।
+        if form.is_valid(): ## ফর্মটির ভ্যালিডিটি চেক
+            file = form.cleaned_data['file']  ## file ভ্যারিয়েবলে cleaned_data থেকে  'file' ফিল্ডে প্রাপ্ত ফাইলটি নেয়া হয়েছে। 
+            with open('./first_app/uploads/' + file.name, 'wb+') as destination: 
+                for chunk in file.chunks():
+                    destination.write(chunk)
+
+	## './first_app/uploads/' ডিরেকটরিতে ফাইলটি ওপেন করা হয়েছে 'wb+' মোডে, file.chunks() মেথড কল করে 
+	## ফাইলটির প্রতিটি ছোট অংশ বা chunk কে  destination অর্থ্যাৎ './first_app/uploads/' ডিরেকটরিতে write করা হয়েছে। 
+	## এখানে 'wb+' মোডে ফাইলটি ওপেন করার কারন হলো ফাইলটির জন্য Read,Write .. সব ধরনের এক্সেস এলাও করা হয়েছে।
+
+
+            print(form.cleaned_data)  ## Access or get , form data
+    else:
+        form = contactForm()
+    return render(request, './first_app/django_form.html', {'form':form}) 
+
+
+index.html =>
+
+<form method='POST' enctype="multipart/form-data">
+enctype="multipart/form-data" এ্যাড করার উদ্দ্যেশ্য হলো ফর্মটিতে ডেটার ( ইন্টিজার, ফ্লোট, ডাবল, স্ট্রিং ইত্যাদি ) পাশাপাশি ফাইল ইনপুট নিতে এলাও করা।
+
+
+########## Attributes ও  Widgets =>>>>>>>>>>>>> widgets => fields to html input
+from django import forms
+
+class contactForm(forms.Form):
+    name = forms.CharField(label="Full Name : ", help_text="Total length must be within 70 characters", required=False, error_messages={'required': 'Please enter your name.'},widget = forms.Textarea(attrs = {'id' : 'text_area', 'class' : 'class1 class 2', 'placeholder' : 'Enter your name'},))  ## CharField কে textarea-তে রুপান্তর 
+    email = forms.EmailField(label = "User Email")
+    age = forms.CharField(widget=forms.NumberInput)
+    check = forms.BooleanField()
+    birthday = forms.CharField(widget=forms.DateInput(attrs= {'type' : 'date'})) ## CharField appointment কে DateInput ফিল্ডে রুপান্তর
+    appointment = forms.CharField(widget=forms.DateInput(attrs= {'type' : 'datetime-local'}))
+    CHOICES = [('S', 'Small'), ('M', 'Medium'), ('L', 'Large')]
+    size = forms.ChoiceField(choices=CHOICES, widget = forms.RadioSelect)
+    MEAL = [('P', 'Pepperoni'), ('M', 'Mashroom'), ('B', 'Beef')]
+    pizza = forms.MultipleChoiceField(choices=MEAL, widget=forms.CheckboxSelectMultiple)
+ 
+
+
+############ Form validation =>>>>>>>>>>>
+forms.py =>
+from django import forms
+ 
+class StudentData(forms.Form):
+    name =forms.CharField(widget=forms.TextInput)
+    email =forms.CharField(widget=forms.EmailInput)
+	
+    ## single fields custom validation. clean_fieldName ##
+    def clean_name(self):
+        valname = self.cleaned_data['name'] ## Access field value
+        if len(valname) < 10: ## check
+            raise forms.ValidationError("Enter a name with at least 10 characters")    ## Error message
+        return valname
+
+    ## Form validation for all fields ##
+    def clean(self):  ## জ্যাংগোর বিল্ট-ইন clean( )  ফাংশন
+        cleaned_data = super().clean() ## Form ক্লাসের ফাংশন clean( ) কে কল করে ফর্মটির clean ডেটা  cleaned_data নামক ভ্যরিয়েবলে রেখেছি।
+					## এখানে খেয়াল করা জরুরি যে cleaned_data ভ্যারিয়েবলে ফর্মটির সব ফিল্ডের ক্লিনড ডেটা আছে।
+        valname = self.cleaned_data['name']  ## নির্দিষ্ট ফিল্ডের ডেটা আলাদা আলাদা ভ্যারিয়েবলে রেখেছি
+        valemail = self.cleaned_data['email']  ## নির্দিষ্ট ফিল্ডের ডেটা আলাদা আলাদা ভ্যারিয়েবলে রেখেছি
+        if len(valname) < 10:   		## check name field
+            raise forms.ValidationError("Enter a name with at least 10 characters")    
+        if '.com' not in valemail:		## check email field
+            raise forms.ValidationError("Your email must contain .com")
+
+
+############## Built in form validator =>>>>>>>>>>> 
+validators.MinLengthValidator(), validators.MaxValueValidator(), validators.EmailValidator(), 
+validators.FileExtensionValidator(), validators.MaxValueValidator(), validators.MinValueValidator()
+forms.py =>
+from django.core import validators
+def len_check(value):
+    if len(value) < 10:
+        raise forms.ValidationError("Enter a value at least 10 chars")
+  
+class StudentData(forms.Form):
+    name =forms.CharField(
+        validators=[validators.MinLengthValidator(10, message='Enter a name with at least 10 characters')])
+    
+    email =forms.CharField(
+        widget=forms.EmailInput,
+        validators=[validators.EmailValidator(message="Enter a valid Email")])
+    
+    age = forms.IntegerField(
+        validators=[validators.MaxValueValidator(34, message="age must be maximum 34"),
+                    validators.MinValueValidator(24, message="age must be at least 24")])
+    
+    file = forms.FileField(
+        validators=[validators.FileExtensionValidator(allowed_extensions=['pdf','png'], message = '.pdf .png Only')])
+    
+    text = forms.CharField(
+        widget=forms.TextInput, validators=[len_check])
+
