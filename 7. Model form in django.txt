@@ -1,0 +1,136 @@
+### Documentation => https://docs.djangoproject.com/en/5.0/topics/forms/modelforms/
+#### ModelForm => >>>>>>>>>>>>>>>
+    ModelForm is a form that is automatically generated from an existing model.
+    A ModelForm includes all the fields defined in the model, along with any
+    additional validation and processing logic that you define in the form class.
+
+### Meta class =>>>>>>>>>>>>
+
+A metaclass is a class that defines how other classes should behave. provides
+additional information about the model form. Here are some common options that
+can be defined in the Meta class:
+
+1. model: The model that the form is based on.
+2. fields: A list of fields to include in the form. If this option is not specified, 
+all fields in the model will be included in the form.
+3. exclude: A list of fields to exclude from the form.
+4. widgets: A dictionary of field names and their associated widgets.
+5. labels: A dictionary of field names and their associated labels.
+6. help_texts: A dictionary of field names and their associated help text.
+7. error_messages: A dictionary of field names and their associated error messages.
+
+
+##### Model form fields =>>>>>>>>>>>
+Model field		Form field
+-----------     	----------
+
+1. BooleanField	  BooleanField, or NullBooleanField if null=True.
+2. CharField	  CharField with max_length set to the model field’s max_length and empty_value set to None if null=True.
+3. DateField	  DateField
+4. DateTimeField  DateTimeField
+5. DecimalField	  DecimalField
+6. EmailField	  EmailField
+7. FileField	  FileField
+8. FloatField	  FloatField
+9. ImageField	  ImageField
+10. SlugField	  SlugField
+11. TextField	  CharField with widget=forms.Textarea
+12. TimeField	  TimeField
+13. IntegerField   IntegerField
+14. ForeignKey	     ModelChoiceField (see below)
+15. ManyToManyField	ModelMultipleChoiceField (see below)
+
+--------------------------------------------------------------------------------------------------
+
+BigIntegerField	IntegerField with min_value set to -9223372036854775808 and max_value set to 9223372036854775807.
+BinaryField	  CharField, if editable is set to True on the model field, otherwise not represented in the form.
+DurationField	DurationField
+FilePathField	FilePathField
+IPAddressField	IPAddressField
+GenericIPAddressField	GenericIPAddressField
+JSONField	JSONField
+PositiveBigIntegerField	IntegerField
+PositiveIntegerField	IntegerField
+PositiveSmallIntegerField	IntegerField
+SmallAutoField	Not represented in the form
+SmallIntegerField	IntegerField
+URLField	URLField
+UUIDField	UUIDField
+
+--------------------------------------------------------------------------------------------------
+
+1. If the model field has blank=True, then required is set to False on the form field. Otherwise, required=True.
+
+
+########## Save form or model data =>>>>>>>>>>>>
+save (commit=False/True) Method form. This method creates and saves a database object
+from the data bound to the form. by default True
+save (commit=False/True)
+if commit=False , then it will return an object that hasn’t yet been saved to the database.
+
+
+########################### model form and save new data from model form in database #########################
+model.py =>
+    class Student(models.Model):
+        name = models.CharField(max_length= 20)
+        roll = models.IntegerField(primary_key= True)
+        address = models.TextField()
+        father_name = models.TextField(default="Rahim")
+
+forms.py =>
+    from django import forms
+    from first_app.models import Student
+
+    class StudentForm(forms.ModelForm):  ## ModelForm ক্লাসকে ইনহেরিট করার মাধ্যমে StudentForm পাইথন ক্লাসটিকে একটি মডেল-ফর্মে রুপান্তর করা হয়েছে
+        class Meta:
+            model = Student
+            fields = '__all__'
+
+--------------- optional part -------------
+        labels = {
+            'name' : 'Student Name',
+            'roll' : "Student Roll"
+        }
+        widgets  = {
+            'name' : forms.TextInput(),
+        }
+        help_texts = {
+            'name' : "Write your full name"
+        }
+        
+        error_messages = {
+            'name' : {'required' : 'Your name is required'}
+        }
+
+
+views.py =>
+    def add_student(request):
+        form = forms.StudentForm()
+        return render(request, 'add_student.html', {'form' : form})  ## কনটেক্সট ডাটা form সহ 'add_student.html' ফাইলটি রেন্ডার করা হয়েছে
+
+----------  মডেল-ফর্ম থেকে প্রাপ্ত ডেটা ডেটাবেজে সেভ করা ----------
+** request.method == 'POST' হলে ও form.is_valid() True হলে form.save() ফাংশন কল করে form ভেরিয়েবলে প্রাপ্ত ডেটা ডেটাবেজে সেভ করা হয়েছে । 
+
+def add_student(request):
+    if request.method == 'POST':
+        form = forms.StudentForm(request.POST)  ## Access or get forms data
+        if form.is_valid():
+            form.save()
+    else:
+        form = forms.StudentForm()  ## if method are not POST, user can see a form in frontend without data.
+    return render(request, 'add_student.html', {'form' : form}) ## finally render add_student.html and add context data
+
+
+
+urls.py =>
+    path('add/', views.add_student, name="add_student"),
+
+
+Html file =>
+      <form method="post">
+        {{form.as_p}}
+        <!-- <button class = "btn btn-primary" type = "submit"></button> -->
+        <input class="btn btn-primary" type="submit" value="Submit">
+      </form>
+
+
