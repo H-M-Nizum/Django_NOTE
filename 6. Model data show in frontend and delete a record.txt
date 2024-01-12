@@ -1,0 +1,79 @@
+model.py =>>>>>>>>>>
+
+from django.db import models
+
+# Create your models here.
+
+class Student(models.Model):
+    name = models.CharField(max_length= 20)
+    roll = models.IntegerField(primary_key= True)
+    address = models.TextField()
+    father_name = models.TextField(default="Rahim")
+    
+    def __str__(self):
+        return f"Roll : {self.roll} - {self.name}"
+
+views.py =>>>>>>>>>>
+
+from django.shortcuts import render
+from . import models
+# Create your views here.
+
+def function_name(request):
+    data = models.Model_name.objects.all()   ## Model এর সবগুলো অব্জেক্ট data ভেরিয়েবলে রাখা হয়েছে | 
+					## Here variable data is a list that contain model object
+    return render(request,"index.html", {'data': data})  
+	## "index.html" ফাইলটি রেন্ডার করা হয়েছে and data ভেরিয়েবলের ডেটা 'data' নামক key হিসেবে কনটেক্সট আকারে পাঠানো হয়েছে |
+
+
+index.html =>>>>>>>>>>
+
+{% if data %}   ## Check data are available or not.
+    {% for st in data %} # Here the type of variable data is a list. and st is a object. st.Model_fields_name
+          <p>{{st.roll}}</p>
+          <p>{{st.name}}</p>
+          <p>{{st.father_name}}</p>
+          <p>{{st.address}}</p>
+    {%endfor%}
+{% else %}
+    <h3>No data available to show</h3>
+{% endif%}
+
+
+
+
+############### We can delet a model record in frontend ###########################
+
+1. For a particular record create a url __
+
+    path('delete/<int:id>', views.function_name, name="delete_somethis"),
+
+2. For a particular record create a views __
+
+    from django.shortcuts import render, redirect
+    from . import models
+
+    def function_name(request, id):
+    	particular_record_data = models.model_name.objects.get(pk = id).delete()
+	## objects.get() ফাংশনে প্রাইমারি key এর ভ্যালু হিসেবে 'id' পাঠিয়ে মডেলের নির্দিষ্ট একটা রেকর্ড সিলেক্ট করেছি, 
+	## তারপর সেই রেকর্ডের জন্য delete() ফাংশন কল করে নির্দিষ্ট সেই রেকর্ড ডিলিট করেছি।
+
+    	return redirect("homepage") ## 'homepage' নামক URL প্যাটার্নে , অর্থ্যাৎ, 'home/' URL -এ রিডিরেক্ট করা হয়েছে।
+
+3. For a particular record create a button in html file __
+
+{% if data %}   ## Check data are available or not.
+    {% for st in data %} # Here the type of variable data is a list. and st is a object. st.Model_fields_name
+          <p>{{st.roll}}</p>
+          <p>{{st.name}}</p>
+          <p>{{st.father_name}}</p>
+          <p>{{st.address}}</p>
+	  
+	  <a href="{% url 'delete_something' st.id %}">Delete</a> ## Here id or must primary key.
+
+    {%endfor%}
+{% else %}
+    <h3>No data available to show</h3>
+{% endif%}
+
+
