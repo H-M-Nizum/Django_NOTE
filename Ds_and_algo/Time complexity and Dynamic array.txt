@@ -1,0 +1,55 @@
+Time Complexity Grammer - 1) Always calculate for worst case . 2) Ignore the cinstants (like 2n, 3n, 4n means n and n/2, n/3, n/4 means n)
+
+Online judge given time 1s, 2s, 3s 
+1s means 10^7 
+2s means 2X10^7
+3s means 3X10^7
+
+
+Complexity ranking ->>>
+o(1)  <  O(log(n))  <  O(sqrt(n))  <  O(n)  <  O(Nlog(n))  <  O(n*n)/O(n*m)  <  O(m^n) 
+
+Space complexity -> 1) Input space 2) Ausiliary space
+o(n) space complexity 10^6 possible. Then over all same to time complexity
+
+
+
+O(n) ->> Linear complesity
+for(int i=0; i<n; i++){
+}
+
+example :- (n, 2n, 3n, n/2, n/3, n+something, n-something) all of complexity n
+Array max length 10^7
+
+
+O(log(n)) ->> Array max length 10^18
+N/2^k
+
+if array travers incress or decress by divide or multiple
+for(int i=1; i<n; i=i*2){
+} 
+for(int i=n; i>0; i=i/2){
+}
+
+
+O(sqrt(n)) =>> Array max length 10^12
+use for find all divisor
+for(int i=1; i<=sqrt(n); i++){
+}
+for(int i=1; i*i<n; i++){
+}
+
+O(Nlog(n)) ->> Array max length 10^5
+Buit in sort function use this complexity
+for(int i=1; i<n; i++){
+	while(i>0){
+		i = i/10;
+	}
+}
+
+
+
+O(n*n) or O(n*m) ->> Array max length 10^3
+Use this complexity for nested loop, use selection sort
+
+

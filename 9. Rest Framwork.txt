@@ -1,0 +1,7 @@
+Rest Api -> Representational state Transfer API
+
+Jsonor javascript object notation is a language independent open data format the uses human
+readable tex to ezpress data objects consisting of attribute.
+
+
+serializers -  serializers use for our data representations.
